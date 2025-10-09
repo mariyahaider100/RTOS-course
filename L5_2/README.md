@@ -1,134 +1,92 @@
-## 🔒 FreeRTOS Mutex Demo (ESP32)
+## 🔒 FreeRTOS Mutex Example (ESP32)
 
-### 🎯 Task Goal
+### 🎯 Objective
 
-1. Understand how **mutex (mutual exclusion)** works in FreeRTOS.
-2. Input an integer from the Serial Monitor to set the  **start value of a shared counter** .
-3. Display the counter safely using a mutex so multiple tasks can update it without conflicts.
-
----
-
-### 🧠 Concept
-
-A **mutex** ensures only one task accesses shared data at a time — preventing data corruption when multiple tasks read/write the same variable.
-
-If one task “takes” the mutex, others must wait until it’s “given” back.
+1. Learn how a **mutex (mutual exclusion)** mechanism works in FreeRTOS.  
+2. Accept an integer input from the Serial Monitor to set the **initial value of a shared counter**.  
+3. Safely update and print the counter using a mutex to prevent data conflicts between multiple tasks.
 
 ---
 
-### 🧩 Final Code
+### 🧠 Overview
 
-<pre class="overflow-visible!" data-start="684" data-end="2380"><div class="contain-inline-size rounded-2xl relative bg-token-sidebar-surface-primary"><div class="sticky top-9"><div class="absolute end-0 bottom-0 flex h-9 items-center pe-2"><div class="bg-token-bg-elevated-secondary text-token-text-secondary flex items-center gap-4 rounded-sm px-2 font-sans text-xs"></div></div></div><div class="overflow-y-auto p-4" dir="ltr"><code class="whitespace-pre! language-cpp"><span><span>#include</span><span></span><span><Arduino.h></span><span>
-</span><span>#include</span><span></span><span>"freertos/FreeRTOS.h"</span><span>
-</span><span>#include</span><span></span><span>"freertos/semphr.h"</span><span>
+A **mutex** allows only one task to access shared resources at a time.  
+When one task “takes” the mutex, all others trying to access the same resource must wait until it is “released.”  
+This synchronization prevents inconsistent or corrupted data in concurrent systems.
 
-</span><span>static</span><span></span><span>int</span><span> shared_counter = </span><span>0</span><span>;
+---
+
+### 🧩 Complete Code
+
+```cpp
+#include <Arduino.h>
+#include "freertos/FreeRTOS.h"
+#include "freertos/semphr.h"
+
+static int shared_counter = 0;
 SemaphoreHandle_t mutex;
 
-</span><span>// Task: Increment shared counter safely</span><span>
-</span><span>void</span><span></span><span>incTask</span><span>(void</span><span> *parameters) {
-  </span><span>int</span><span> local_var;
+// Task: Safely increment the shared counter
+void incTask(void *parameters) {
+  int local_var;
 
-  </span><span>while</span><span> (</span><span>1</span><span>) {
-    </span><span>if</span><span> (</span><span>xSemaphoreTake</span><span>(mutex, portMAX_DELAY) == pdTRUE) {
+  while (1) {
+    if (xSemaphoreTake(mutex, portMAX_DELAY) == pdTRUE) {
       local_var = shared_counter;
       local_var++;
-      </span><span>vTaskDelay</span><span>(</span><span>pdMS_TO_TICKS</span><span>(</span><span>100</span><span>));  </span><span>// simulate work</span><span>
+      vTaskDelay(pdMS_TO_TICKS(100));  // Simulate some processing delay
       shared_counter = local_var;
 
-      Serial.</span><span>printf</span><span>(</span><span>"Counter = %d\n"</span><span>, shared_counter);
+      Serial.printf("Counter = %d\n", shared_counter);
 
-      </span><span>xSemaphoreGive</span><span>(mutex);
+      xSemaphoreGive(mutex);
     }
 
-    </span><span>vTaskDelay</span><span>(</span><span>pdMS_TO_TICKS</span><span>(</span><span>200</span><span>));
+    vTaskDelay(pdMS_TO_TICKS(200));
   }
 }
 
-</span><span>// Task: Read user input to set counter start value</span><span>
-</span><span>void</span><span></span><span>inputTask</span><span>(void</span><span> *parameters) {
-  </span><span>while</span><span> (</span><span>1</span><span>) {
-    </span><span>if</span><span> (Serial.</span><span>available</span><span>() > </span><span>0</span><span>) {
-      </span><span>int</span><span> val = Serial.</span><span>parseInt</span><span>();
+// Task: Read Serial input and reset counter
+void inputTask(void *parameters) {
+  while (1) {
+    if (Serial.available() > 0) {
+      int val = Serial.parseInt();
 
-      </span><span>if</span><span> (</span><span>xSemaphoreTake</span><span>(mutex, portMAX_DELAY) == pdTRUE) {
+      if (xSemaphoreTake(mutex, portMAX_DELAY) == pdTRUE) {
         shared_counter = val;
-        Serial.</span><span>printf</span><span>(</span><span>"Counter reset to %d\n"</span><span>, shared_counter);
-        </span><span>xSemaphoreGive</span><span>(mutex);
+        Serial.printf("Counter reset to %d\n", shared_counter);
+        xSemaphoreGive(mutex);
       }
 
-      </span><span>// Clear remaining input</span><span>
-      </span><span>while</span><span> (Serial.</span><span>available</span><span>()) Serial.</span><span>read</span><span>();
+      // Clear any leftover input
+      while (Serial.available()) Serial.read();
     }
 
-    </span><span>vTaskDelay</span><span>(</span><span>pdMS_TO_TICKS</span><span>(</span><span>100</span><span>));
+    vTaskDelay(pdMS_TO_TICKS(100));
   }
 }
 
-</span><span>void</span><span></span><span>setup</span><span>()</span><span> {
-  Serial.</span><span>begin</span><span>(</span><span>115200</span><span>);
-  </span><span>vTaskDelay</span><span>(</span><span>pdMS_TO_TICKS</span><span>(</span><span>1000</span><span>));
-  Serial.</span><span>println</span><span>(</span><span>"\n--- FreeRTOS Mutex Demo ---"</span><span>);
-  Serial.</span><span>println</span><span>(</span><span>"Enter a number to reset the counter:"</span><span>);
+void setup() {
+  Serial.begin(115200);
+  vTaskDelay(pdMS_TO_TICKS(1000));
+  Serial.println("\n--- FreeRTOS Mutex Example ---");
+  Serial.println("Type a number in Serial Monitor to reset the counter:");
 
-  </span><span>// Create mutex</span><span>
-  mutex = </span><span>xSemaphoreCreateMutex</span><span>();
-  </span><span>if</span><span> (mutex == </span><span>NULL</span><span>) {
-    Serial.</span><span>println</span><span>(</span><span>"Failed to create mutex!"</span><span>);
-    </span><span>while</span><span> (</span><span>1</span><span>);
+  // Create mutex
+  mutex = xSemaphoreCreateMutex();
+  if (mutex == NULL) {
+    Serial.println("Mutex creation failed!");
+    while (1);
   }
 
-  </span><span>// Create tasks</span><span>
-  </span><span>xTaskCreate</span><span>(incTask, </span><span>"Increment Task 1"</span><span>, </span><span>2048</span><span>, </span><span>NULL</span><span>, </span><span>1</span><span>, </span><span>NULL</span><span>);
-  </span><span>xTaskCreate</span><span>(incTask, </span><span>"Increment Task 2"</span><span>, </span><span>2048</span><span>, </span><span>NULL</span><span>, </span><span>1</span><span>, </span><span>NULL</span><span>);
-  </span><span>xTaskCreate</span><span>(inputTask, </span><span>"Input Task"</span><span>, </span><span>2048</span><span>, </span><span>NULL</span><span>, </span><span>1</span><span>, </span><span>NULL</span><span>);
+  // Create tasks
+  xTaskCreate(incTask, "Increment Task 1", 2048, NULL, 1, NULL);
+  xTaskCreate(incTask, "Increment Task 2", 2048, NULL, 1, NULL);
+  xTaskCreate(inputTask, "Input Task", 2048, NULL, 1, NULL);
 
-  </span><span>vTaskDelete</span><span>(</span><span>NULL</span><span>);  </span><span>// end setup task</span><span>
+  vTaskDelete(NULL);  // Delete setup task
 }
 
-</span><span>void</span><span></span><span>loop</span><span>()</span><span> {
-  </span><span>// Not used</span><span>
+void loop() {
+  // Unused — all logic handled in FreeRTOS tasks
 }
-</span></span></code></div></div></pre>
-
----
-
-### 🧪 Expected Output
-
-<pre class="overflow-visible!" data-start="2410" data-end="2577"><div class="contain-inline-size rounded-2xl relative bg-token-sidebar-surface-primary"><div class="sticky top-9"><div class="absolute end-0 bottom-0 flex h-9 items-center pe-2"><div class="bg-token-bg-elevated-secondary text-token-text-secondary flex items-center gap-4 rounded-sm px-2 font-sans text-xs"></div></div></div><div class="overflow-y-auto p-4" dir="ltr"><code class="whitespace-pre!"><span><span>--- FreeRTOS Mutex Demo ---
-Enter a number to reset the counter:
-Counter = 1
-Counter = 2
-Counter = 3
-...
-> 50
-Counter reset to 50
-Counter = 51
-Counter = 52
-...
-</span></span></code></div></div></pre>
-
----
-
-### 🧭 Steps to Test
-
-**In Wokwi / Arduino IDE:**
-
-1. Create new ESP32 (Arduino) project.
-2. Paste the code above.
-3. Open Serial Monitor (115200 baud).
-4. Observe the counter increasing.
-5. Enter a number (e.g. `100`) → counter resets safely to that value.
-
-📸 **Screenshots to include:**
-
-* Serial Monitor showing counter increments
-* Reset message after entering a value
-
----
-
-### ✅ Why It Works
-
-* Both increment tasks use the same shared counter.
-* Mutex ensures only one task modifies it at a time.
-* The input task also uses the same mutex when resetting — keeping all access thread-safe and consistent.
