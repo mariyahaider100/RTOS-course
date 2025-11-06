@@ -1,4 +1,4 @@
-![image](/Exercise%20L6%20Counting/Screenshot%20from%202025-11-03%2000-31-21.png)
+![image](https://github.com/mariyahaider100/RTOS-course/blob/e5218bd8454c966288fb4d0c2dce428a12754257/Exercise_6_counting/Screenshot%202025-11-06%20at%2020.12.01.png)
 
 # FreeRTOS Counting Semaphore Example (ESP32)
 
