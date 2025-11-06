@@ -1,6 +1,6 @@
 # 🧠 ESP32 FreeRTOS Deadlock Demo & Solutions
 
-![image](/Exercise%20L8/Screenshot%20from%202025-11-02%2023-59-46.png)
+![image](https://github.com/mariyahaider100/RTOS-course/blob/a010eb4719cee59a6ebf4eb92f5123503ff791a7/Exercise_L8/Screenshot%202025-11-06%20at%2020.23.41.png)
 
 This project showcases how **deadlocks** can occur in **FreeRTOS** running on the **ESP32**, and presents **three effective strategies** to avoid or resolve them:
 
