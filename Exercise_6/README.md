@@ -1,3 +1,4 @@
+![image](https://github.com/mariyahaider100/RTOS-course/blob/0f0c94baf8bf63e8c277121882fbb332c1ee5167/Exercise_6/Screenshot%202025-11-06%20at%2020.05.00.png)
 ---
 # 🔦 ESP32 FreeRTOS Binary Semaphore Example
 
