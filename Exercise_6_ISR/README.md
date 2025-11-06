@@ -1,4 +1,4 @@
-![image](/Exercise%20L6%20ISR/Screenshot%20from%202025-11-02%2023-58-33.png)
+![image](https://github.com/mariyahaider100/RTOS-course/blob/b47a7660b4dce92cd18307b98f66bf8d57fb86db/Exercise_6_ISR/Screenshot%202025-11-06%20at%2020.17.50.png)
 
 # ESP32 Timer + Semaphore Rolling Average Demo (Arduino-ESP32 v3.x)
 
