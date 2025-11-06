@@ -130,7 +130,7 @@ Task L, Core 0
 ...
 ```
 
-![image](/Exercise%20L9/Core_0_1.png)
+![image](https://github.com/mariyahaider100/RTOS-course/blob/main/Exercise_L9/Core_0_1.png)
 
 🔹 Each task consistently runs on its assigned core, confirming correct pinning and parallel execution.  
 
@@ -149,7 +149,7 @@ Task L, Core 0
 ...
 ```
 
-![image](/Exercise%20L9/Core_tskNO_AFFINITY.png)
+![image](https://github.com/mariyahaider100/RTOS-course/blob/main/Exercise_L9/Core_tskNO_AFFINITY.png)
 
 🔹 Tasks begin on Core 1 (the default for Arduino `setup()`), but the scheduler later migrates one to Core 0, showing that FreeRTOS can dynamically balance load when no affinity is set.
 
