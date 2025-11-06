@@ -52,6 +52,3 @@ The LED will then blink every 500 milliseconds repeatedly.
 
 ---
 
-## 🧭 Usage Instructions
-
-### Step 1️⃣ — Clone the Repository
